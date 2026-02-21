@@ -17,7 +17,11 @@ public class ItemWithGravity extends Item {
     public void fall() {
         Point2D<Integer> pos = wrapped.getCurrentPosition();
         pos.setY(pos.getY() + fallSpeed);
-        this.currentPosition = pos;
+    }
+
+    @Override
+    public Point2D<Integer> getCurrentPosition() {
+        return wrapped.getCurrentPosition();
     }
 
     public int getFallSpeed() {
@@ -35,7 +39,11 @@ public class ItemWithGravity extends Item {
     @Override
     public void reset(int x, int y) {
         wrapped.reset(x, y);
-        this.currentPosition = wrapped.getCurrentPosition();
+    }
+
+    @Override
+    public Point2D<Integer> getCenter() {
+        return wrapped.getCenter();
     }
 
     @Override

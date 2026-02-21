@@ -13,6 +13,7 @@ public class GameWindow extends JFrame implements KeyListener {
     private int width = 500;
     private int height = 500;
     private Font gamePausedFont;
+    private boolean debugging = false;
 
     // Panels
     private InfoPanel infoPanel;
@@ -49,9 +50,18 @@ public class GameWindow extends JFrame implements KeyListener {
         if (keyCode == KeyEvent.VK_SPACE) {
             infoPanel.getHealthBar().update(-10);
         }
+
+        if (keyCode == KeyEvent.VK_F1) {
+            debugging = !debugging;
+            gamePanel.setDebugging(debugging);
+        }
+
+        gamePanel.getPlayer().keyPressed(e);
     }
 
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        gamePanel.getPlayer().keyReleased(e);
+    }
     public void keyTyped(KeyEvent e) {}
 
     private void loadFont() {

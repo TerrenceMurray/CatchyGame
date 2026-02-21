@@ -19,4 +19,5 @@ public abstract class Item {
     }
 
     public abstract void render(Graphics g);
+    public abstract Point2D<Integer> getCenter();
 }
