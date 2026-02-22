@@ -1,6 +1,8 @@
 package work.terrencemurray.items;
 
 import work.terrencemurray.items.decorators.ItemWithBoxCollider;
+import work.terrencemurray.items.decorators.ItemWithCollectable;
+import work.terrencemurray.items.decorators.ItemWithCollectable.ItemType;
 import work.terrencemurray.items.decorators.ItemWithGravity;
 
 public class ItemFactory {
@@ -13,6 +15,11 @@ public class ItemFactory {
 
     public ItemFactory reset(Item item) {
         this.item = item;
+        return this;
+    }
+
+    public ItemFactory addCollectable(ItemType type) {
+        this.item = new ItemWithCollectable(item, type);
         return this;
     }
 

@@ -3,7 +3,7 @@ package work.terrencemurray.items;
 import work.terrencemurray.position.Point2D;
 import java.awt.Graphics;
 
-public abstract class Item {
+public class Item {
     protected Point2D<Integer> currentPosition;
 
     public Item(int x, int y) {
@@ -18,6 +18,9 @@ public abstract class Item {
         this.currentPosition = new Point2D<>(x, y);
     }
 
-    public abstract void render(Graphics g);
-    public abstract Point2D<Integer> getCenter();
+    public void render(Graphics g) {}
+
+    public Point2D<Integer> getCenter() {
+        return new Point2D<>(currentPosition.getX(), currentPosition.getY());
+    }
 }
