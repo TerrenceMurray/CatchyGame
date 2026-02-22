@@ -35,8 +35,17 @@ public class ItemWithBoxCollider extends Item {
         this.isDebugging = false;
     }
 
+    public Item getWrapped() {
+        return wrapped;
+    }
+
     public void setDebugging(boolean flag) {
         this.isDebugging = flag;
+    }
+
+    public void renderDebug(Graphics g) {
+        if (!this.isDebugging) return;
+        this.drawBoundingBox(g);
     }
 
     private void drawBoundingBox(Graphics g) {

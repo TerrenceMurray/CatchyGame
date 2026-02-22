@@ -3,11 +3,15 @@ package work.terrencemurray.infrastructure.player;
 import java.awt.event.KeyListener;
 
 import work.terrencemurray.infrastructure.items.Item;
+import work.terrencemurray.infrastructure.items.decorators.ItemWithBoxCollider;
 import work.terrencemurray.infrastructure.position.Point2D;
 import work.terrencemurray.infrastructure.ui.HealthBar;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 public class Player extends Item implements KeyListener {
@@ -22,6 +26,7 @@ public class Player extends Item implements KeyListener {
 
     private int width;
     private int height;
+    private final ItemWithBoxCollider collider;
 
     private float targetX;
     private boolean movingLeft;
@@ -34,19 +39,27 @@ public class Player extends Item implements KeyListener {
         this.height = 25;
         this.movementSpeed = 8;
         this.targetX = 250;
+        this.collider = new ItemWithBoxCollider(this, this.width, this.height);
+    }
+
+    public ItemWithBoxCollider getCollider() {
+        return this.collider;
     }
 
     private float lerp(float start, float end, float t) {
         return start + (end - start) * t;
     }
 
-    public void update() {
+    public void update(int panelWidth, int panelHeight) {
         if (movingLeft) targetX -= movementSpeed;
         if (movingRight) targetX += movementSpeed;
+
+        targetX = Math.max(0, Math.min(targetX, panelWidth - width));
 
         float currentX = this.currentPosition.getX();
         float newX = this.lerp(currentX, targetX, 0.25f);
         this.currentPosition.setX(Math.round(newX));
+        this.currentPosition.setY(panelHeight - height - 20);
     }
 
     public Point2D<Integer> getCenter() {
@@ -56,8 +69,26 @@ public class Player extends Item implements KeyListener {
     }
 
     public void render(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(this.getCurrentPosition().getX(), this.currentPosition.getY(), this.width, this.height);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        int x = this.getCurrentPosition().getX();
+        int y = this.currentPosition.getY();
+
+        // Basket body with gradient
+        GradientPaint gradient = new GradientPaint(x, y, new Color(139, 90, 43), x, y + height, new Color(101, 67, 33));
+        g2.setPaint(gradient);
+        g2.fillRoundRect(x, y, this.width, this.height, 12, 12);
+
+        // Rim highlight
+        g2.setColor(new Color(185, 135, 80));
+        g2.fillRoundRect(x + 2, y, this.width - 4, 6, 6, 6);
+
+        // Outline
+        g2.setColor(new Color(70, 45, 20));
+        g2.drawRoundRect(x, y, this.width, this.height, 12, 12);
+
+        this.collider.renderDebug(g);
     }
 
     public void keyPressed(KeyEvent event) {

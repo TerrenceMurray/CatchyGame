@@ -1,7 +1,6 @@
 package work.terrencemurray.infrastructure.ui;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -25,24 +24,29 @@ public class InfoPanel extends JPanel {
     }
 
     private void buildHealthBar() {
-        healthBar = new HealthBar(180, 20, 50);
-        JPanel healthContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
+        healthBar = new HealthBar(150, 18, 100);
+        JPanel healthContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         healthContainer.setOpaque(false);
+
+        JLabel hpLabel = new JLabel("HP");
+        hpLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        hpLabel.setForeground(new Color(220, 40, 40));
+
+        healthContainer.add(hpLabel);
         healthContainer.add(healthBar);
         this.add(healthContainer, BorderLayout.WEST);
     }
 
     private void buildScoreSection(Font font) {
-        JPanel scorePanel = new JPanel();
-        scorePanel.setLayout(new BoxLayout(scorePanel, BoxLayout.X_AXIS));
+        JPanel scorePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 2));
         scorePanel.setOpaque(false);
 
-        currentScoreLabel = new JLabel("SCORE ");
+        currentScoreLabel = new JLabel("SCORE");
         currentScoreLabel.setFont(font.deriveFont(16f));
         currentScoreLabel.setForeground(new Color(150, 150, 150));
 
         currentScoreValueLabel = new JLabel("0");
-        currentScoreValueLabel.setFont(font.deriveFont(24f));
+        currentScoreValueLabel.setFont(new Font("Arial", Font.BOLD, 16));
         currentScoreValueLabel.setForeground(new Color(255, 215, 0));
 
         scorePanel.add(currentScoreLabel);

@@ -32,7 +32,7 @@ public class GameWindow extends JFrame implements KeyListener {
         infoPanel = new InfoPanel(gamePausedFont);
         this.add(infoPanel, BorderLayout.NORTH);
 
-        gamePanel = new GamePanel();
+        gamePanel = new GamePanel(infoPanel);
         this.add(gamePanel, BorderLayout.CENTER);
 
         this.addKeyListener(this);
@@ -47,15 +47,12 @@ public class GameWindow extends JFrame implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
-        if (keyCode == KeyEvent.VK_SPACE) {
-            infoPanel.getHealthBar().update(-10);
-        }
-
         if (keyCode == KeyEvent.VK_F1) {
             debugging = !debugging;
             gamePanel.setDebugging(debugging);
         }
 
+        // Forward event to player
         gamePanel.getPlayer().keyPressed(e);
     }
 

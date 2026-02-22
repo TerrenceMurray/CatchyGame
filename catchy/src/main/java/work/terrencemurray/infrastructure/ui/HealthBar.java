@@ -36,6 +36,10 @@ public class HealthBar extends JPanel {
         return (int)((barWidth - 2) * ((double) currentHeath / maxHealth));
     }
 
+    public boolean isDead() {
+        return currentHeath <= 0;
+    }
+
     public void update(int interval) {
         if (interval + currentHeath > this.maxHealth) {
             this.currentHeath = this.maxHealth;
