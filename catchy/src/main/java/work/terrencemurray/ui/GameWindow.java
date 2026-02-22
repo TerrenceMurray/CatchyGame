@@ -1,10 +1,7 @@
 package work.terrencemurray.ui;
 
-import java.io.InputStream;
-
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -13,10 +10,8 @@ public class GameWindow extends JFrame implements KeyListener {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 500;
 
-    private Font gameFont;
     private boolean debugging = false;
 
-    private InfoPanel infoPanel;
     private GamePanel gamePanel;
 
     public GameWindow() {
@@ -26,12 +21,7 @@ public class GameWindow extends JFrame implements KeyListener {
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
 
-        loadFont();
-
-        infoPanel = new InfoPanel(gameFont);
-        this.add(infoPanel, BorderLayout.NORTH);
-
-        gamePanel = new GamePanel(infoPanel);
+        gamePanel = new GamePanel();
         this.add(gamePanel, BorderLayout.CENTER);
 
         this.addKeyListener(this);
@@ -56,13 +46,4 @@ public class GameWindow extends JFrame implements KeyListener {
     }
 
     public void keyTyped(KeyEvent e) {}
-
-    private void loadFont() {
-        try {
-            InputStream fontStream = getClass().getResourceAsStream("/fonts/game-paused.otf");
-            gameFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(24f);
-        } catch (Exception e) {
-            gameFont = new Font("Arial", Font.PLAIN, 24);
-        }
-    }
 }

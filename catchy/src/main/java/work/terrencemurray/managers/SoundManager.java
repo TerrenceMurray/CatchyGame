@@ -33,10 +33,10 @@ public class SoundManager {
         // Game over
         clipPaths.put("gameOver", "/sounds/freesound_community-game-over-arcade-6435.wav");
 
-        // Anvil hit variations
-        clipPaths.put("anvilHit1", "/sounds/freesound_community-anvil-hit-1-103967.wav");
-        clipPaths.put("anvilHit2", "/sounds/freesound_community-anvil-hit-2-14845.wav");
-        variations.put("anvilHit", new String[]{"anvilHit1", "anvilHit2"});
+        // Bat hit variations
+        clipPaths.put("batHit1", "/sounds/bat1.wav");
+        clipPaths.put("batHit2", "/sounds/bat2.wav");
+        variations.put("batHit", new String[]{"batHit1", "batHit2"});
 
         // Banana collect variations
         clipPaths.put("bananaCollect1", "/sounds/freesound_community-eating-sound-effect-36186.wav");

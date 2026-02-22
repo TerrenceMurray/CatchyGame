@@ -16,8 +16,12 @@ public class ItemManager {
 
     private static final int ITEM_COUNT = 5;
     private static final int ITEM_SIZE = 40;
-    private static final int ANVIL_SPEED = 4;
-    private static final int BANANA_SPEED = 3;
+    private static final int BAT_SPEED = -5;
+    private static final int BANANA_SPEED = -3;
+    private static final int MIN_ZIGZAG_AMP = 10;
+    private static final int MAX_ZIGZAG_AMP = 30;
+    private static final double MIN_ZIGZAG_FREQ = 0.03;
+    private static final double MAX_ZIGZAG_FREQ = 0.06;
 
     private final ItemPool<Item> pool;
     private final ItemFactory itemFactory = new ItemFactory();
@@ -25,20 +29,23 @@ public class ItemManager {
 
     public ItemManager() {
         pool = new ItemPool<>(() -> {
-            ItemType type = random.nextBoolean() ? ItemType.BANANA : ItemType.ANVIL;
+            ItemType type = random.nextBoolean() ? ItemType.BANANA : ItemType.BAT;
+            int speed = type == ItemType.BAT ? BAT_SPEED : BANANA_SPEED;
+            int amp = randomZigzagAmplitude();
+            double freq = randomZigzagFrequency();
             return itemFactory
                 .create(new Item(0, 0))
                 .addCollectable(type)
                 .addBoxCollider(ITEM_SIZE, ITEM_SIZE)
-                .addGravity(type == ItemType.ANVIL ? ANVIL_SPEED : BANANA_SPEED)
+                .addGravity(speed, amp, freq)
                 .collect();
         }, ITEM_COUNT);
     }
 
-    public void spawnItems(int panelWidth) {
+    public void spawnItems(int panelWidth, int panelHeight) {
         for (int i = 0; i < ITEM_COUNT; i++) {
-            int x = random.nextInt(Math.max(panelWidth - 20, 1));
-            int y = -(random.nextInt(200) + 50);
+            int x = panelWidth + random.nextInt(200) + 50;
+            int y = random.nextInt(Math.max(panelHeight - ITEM_SIZE, 1));
             pool.acquire(x, y);
         }
     }
@@ -54,12 +61,12 @@ public class ItemManager {
             ItemWithBoxCollider itemCollider = unwrapCollider(item);
             if (itemCollider.intersects(playerCollider)) {
                 collisions.add(unwrapCollectable(item).getType());
-                respawnItem(item, panelWidth);
+                respawnItem(item, panelWidth, panelHeight);
                 continue;
             }
 
-            if (item.getCurrentPosition().getY() > panelHeight) {
-                respawnItem(item, panelWidth);
+            if (item.getCurrentPosition().getX() < -ITEM_SIZE) {
+                respawnItem(item, panelWidth, panelHeight);
             }
         }
 
@@ -78,16 +85,26 @@ public class ItemManager {
         }
     }
 
-    private void respawnItem(ItemWithGravity item, int panelWidth) {
+    private void respawnItem(ItemWithGravity item, int panelWidth, int panelHeight) {
         ItemWithCollectable collectable = unwrapCollectable(item);
 
-        ItemType type = random.nextBoolean() ? ItemType.BANANA : ItemType.ANVIL;
+        ItemType type = random.nextBoolean() ? ItemType.BANANA : ItemType.BAT;
         collectable.setType(type);
 
-        int x = random.nextInt(Math.max(panelWidth - 20, 1));
-        int y = -(random.nextInt(300) + 50);
+        int x = panelWidth + random.nextInt(200) + 50;
+        int y = random.nextInt(Math.max(panelHeight - ITEM_SIZE, 1));
         item.reset(x, y);
-        item.setFallSpeed(type == ItemType.ANVIL ? ANVIL_SPEED : BANANA_SPEED);
+        item.setHorizontalSpeed(type == ItemType.BAT ? BAT_SPEED : BANANA_SPEED);
+        item.setZigzagAmplitude(randomZigzagAmplitude());
+        item.setZigzagFrequency(randomZigzagFrequency());
+    }
+
+    private int randomZigzagAmplitude() {
+        return MIN_ZIGZAG_AMP + random.nextInt(MAX_ZIGZAG_AMP - MIN_ZIGZAG_AMP + 1);
+    }
+
+    private double randomZigzagFrequency() {
+        return MIN_ZIGZAG_FREQ + random.nextDouble() * (MAX_ZIGZAG_FREQ - MIN_ZIGZAG_FREQ);
     }
 
     private ItemWithBoxCollider unwrapCollider(ItemWithGravity item) {

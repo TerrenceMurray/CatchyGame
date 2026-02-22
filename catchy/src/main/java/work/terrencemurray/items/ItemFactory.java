@@ -23,8 +23,8 @@ public class ItemFactory {
         return this;
     }
 
-    public ItemFactory addGravity(int fallSpeed) {
-        this.item = new ItemWithGravity(item, fallSpeed);
+    public ItemFactory addGravity(int horizontalSpeed, int zigzagAmplitude, double zigzagFrequency) {
+        this.item = new ItemWithGravity(item, horizontalSpeed, zigzagAmplitude, zigzagFrequency);
         return this;
     }
 

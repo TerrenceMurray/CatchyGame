@@ -11,15 +11,21 @@ import work.terrencemurray.position.Point2D;
 public class ItemWithCollectable extends Item implements Collectable {
 
     public enum ItemType {
-        BANANA("/images/fruit_banana.png", 30),
-        ANVIL("/images/anvil-64x64-black.png", 45);
+        BANANA("/images/fruit_banana.png", 30, 1),
+        BAT("/images/bats.png", 64, 4);
 
         private final Image image;
         private final int size;
+        private final int frameCount;
+        private final int frameWidth;
+        private final int frameHeight;
 
-        ItemType(String path, int size) {
+        ItemType(String path, int size, int frameCount) {
             this.size = size;
             this.image = ImageManager.loadImage(path);
+            this.frameCount = frameCount;
+            this.frameWidth = image != null ? image.getWidth(null) / frameCount : 0;
+            this.frameHeight = image != null ? image.getHeight(null) : 0;
         }
 
         public Image getImage() {
@@ -29,15 +35,31 @@ public class ItemWithCollectable extends Item implements Collectable {
         public int getSize() {
             return size;
         }
+
+        public int getFrameCount() {
+            return frameCount;
+        }
+
+        public int getFrameWidth() {
+            return frameWidth;
+        }
+
+        public int getFrameHeight() {
+            return frameHeight;
+        }
     }
+
+    private static final int ANIMATION_SPEED = 8;
 
     private final Item wrapped;
     private ItemType type;
+    private int animationTick;
 
     public ItemWithCollectable(Item wrapped, ItemType type) {
         super(wrapped.getCurrentPosition().getX(), wrapped.getCurrentPosition().getY());
         this.wrapped = wrapped;
         this.type = type;
+        this.animationTick = 0;
     }
 
     public Item getWrapped() {
@@ -50,6 +72,7 @@ public class ItemWithCollectable extends Item implements Collectable {
 
     public void setType(ItemType type) {
         this.type = type;
+        this.animationTick = 0;
     }
 
     public int getSize() {
@@ -66,7 +89,18 @@ public class ItemWithCollectable extends Item implements Collectable {
         int x = wrapped.getCurrentPosition().getX();
         int y = wrapped.getCurrentPosition().getY();
         int size = type.getSize();
-        g.drawImage(type.getImage(), x, y, size, size, null);
+
+        if (type.getFrameCount() > 1) {
+            int frame = (animationTick / ANIMATION_SPEED) % type.getFrameCount();
+            int sx = frame * type.getFrameWidth();
+            g.drawImage(type.getImage(),
+                x + size, y, x, y + size,
+                sx, 0, sx + type.getFrameWidth(), type.getFrameHeight(),
+                null);
+            animationTick++;
+        } else {
+            g.drawImage(type.getImage(), x, y, size, size, null);
+        }
     }
 
     @Override
