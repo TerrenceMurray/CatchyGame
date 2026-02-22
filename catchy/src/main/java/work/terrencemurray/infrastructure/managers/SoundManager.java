@@ -13,38 +13,34 @@ public class SoundManager {
     private static SoundManager instance = null;
 
     private HashMap<String, Clip> clips;
+    private HashMap<String, String> clipPaths;
     private HashMap<String, String[]> variations;
     private Random random;
 
     private SoundManager() {
         clips = new HashMap<String, Clip>();
+        clipPaths = new HashMap<String, String>();
         variations = new HashMap<String, String[]>();
         random = new Random();
 
-        // Background music
+        // Background music (kept as persistent clip for looping)
         Clip clip = loadClip("/sounds/freesound_community-jungle-6432.wav");
         clips.put("background", clip);
 
         // Game start
-        clip = loadClip("/sounds/freesound_community-game-start-6104.wav");
-        clips.put("gameStart", clip);
+        clipPaths.put("gameStart", "/sounds/freesound_community-game-start-6104.wav");
 
         // Game over
-        clip = loadClip("/sounds/freesound_community-game-over-arcade-6435.wav");
-        clips.put("gameOver", clip);
+        clipPaths.put("gameOver", "/sounds/freesound_community-game-over-arcade-6435.wav");
 
         // Anvil hit variations
-        clip = loadClip("/sounds/freesound_community-anvil-hit-1-103967.wav");
-        clips.put("anvilHit1", clip);
-        clip = loadClip("/sounds/freesound_community-anvil-hit-2-14845.wav");
-        clips.put("anvilHit2", clip);
+        clipPaths.put("anvilHit1", "/sounds/freesound_community-anvil-hit-1-103967.wav");
+        clipPaths.put("anvilHit2", "/sounds/freesound_community-anvil-hit-2-14845.wav");
         variations.put("anvilHit", new String[]{"anvilHit1", "anvilHit2"});
 
         // Banana collect variations
-        clip = loadClip("/sounds/freesound_community-eating-sound-effect-36186.wav");
-        clips.put("bananaCollect1", clip);
-        clip = loadClip("/sounds/freesounds123-crunchy-bite-2-340948.wav");
-        clips.put("bananaCollect2", clip);
+        clipPaths.put("bananaCollect1", "/sounds/freesound_community-eating-sound-effect-36186.wav");
+        clipPaths.put("bananaCollect2", "/sounds/freesounds123-crunchy-bite-2-340948.wav");
         variations.put("bananaCollect", new String[]{"bananaCollect1", "bananaCollect2"});
     }
 
@@ -81,13 +77,29 @@ public class SoundManager {
             title = keys[random.nextInt(keys.length)];
         }
 
-        Clip clip = getClip(title);
-        if (clip != null) {
-            clip.setFramePosition(0);
-            if (looping)
+        // For looping clips (BGM), reuse the persistent clip
+        if (looping) {
+            Clip clip = getClip(title);
+            if (clip != null) {
+                clip.stop();
+                clip.setFramePosition(0);
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
-            else
+            }
+            return;
+        }
+
+        // For SFX, create a fresh clip so overlapping plays work
+        String path = clipPaths.get(title);
+        if (path != null) {
+            Clip clip = loadClip(path);
+            if (clip != null) {
+                clip.addLineListener(event -> {
+                    if (event.getType() == javax.sound.sampled.LineEvent.Type.STOP) {
+                        clip.close();
+                    }
+                });
                 clip.start();
+            }
         }
     }
 
