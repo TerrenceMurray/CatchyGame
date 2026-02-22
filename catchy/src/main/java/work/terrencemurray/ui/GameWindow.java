@@ -1,7 +1,10 @@
 package work.terrencemurray.ui;
 
 import javax.swing.JFrame;
-import java.awt.BorderLayout;
+import javax.swing.JLayeredPane;
+import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -12,17 +15,37 @@ public class GameWindow extends JFrame implements KeyListener {
 
     private boolean debugging = false;
 
+    private InfoPanel infoPanel;
+    private GameOverOverlay gameOverOverlay;
     private GamePanel gamePanel;
 
     public GameWindow() {
         this.setTitle("Catchy");
         this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
 
-        gamePanel = new GamePanel();
-        this.add(gamePanel, BorderLayout.CENTER);
+        JLayeredPane layeredPane = new JLayeredPane();
+
+        infoPanel = new InfoPanel();
+        gameOverOverlay = new GameOverOverlay();
+        gamePanel = new GamePanel(infoPanel, gameOverOverlay);
+
+        layeredPane.add(gamePanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(infoPanel, JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(gameOverOverlay, JLayeredPane.MODAL_LAYER);
+
+        // Keep all panels sized to fill the window
+        layeredPane.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                Dimension size = layeredPane.getSize();
+                gamePanel.setBounds(0, 0, size.width, size.height);
+                infoPanel.setBounds(0, 0, size.width, size.height);
+                gameOverOverlay.setBounds(0, 0, size.width, size.height);
+            }
+        });
+
+        this.setContentPane(layeredPane);
 
         this.addKeyListener(this);
         this.setFocusable(true);
