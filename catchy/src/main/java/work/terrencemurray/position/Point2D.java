@@ -1,4 +1,4 @@
-package work.terrencemurray.infrastructure.position;
+package work.terrencemurray.position;
 
 public class Point2D<T extends Number> {
     private T x;

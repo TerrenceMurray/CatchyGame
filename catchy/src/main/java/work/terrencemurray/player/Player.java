@@ -1,11 +1,10 @@
-package work.terrencemurray.infrastructure.player;
+package work.terrencemurray.player;
 
 import java.awt.event.KeyListener;
 
-import work.terrencemurray.infrastructure.items.Item;
-import work.terrencemurray.infrastructure.items.decorators.ItemWithBoxCollider;
-import work.terrencemurray.infrastructure.position.Point2D;
-import work.terrencemurray.infrastructure.ui.HealthBar;
+import work.terrencemurray.items.Item;
+import work.terrencemurray.items.decorators.ItemWithBoxCollider;
+import work.terrencemurray.position.Point2D;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -15,14 +14,8 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 public class Player extends Item implements KeyListener {
-    
-    class Direction {
-        public static final int LEFT = -1;
-        public static final int RIGHT = +1;
-    }
 
-    protected HealthBar healthBar;
-    protected int movementSpeed;
+    private int movementSpeed;
 
     private int width;
     private int height;

@@ -1,5 +1,4 @@
-package work.terrencemurray.infrastructure.items;
-
+package work.terrencemurray.items;
 
 public interface Collectable {
     public void onCollect(CollectFunction action);

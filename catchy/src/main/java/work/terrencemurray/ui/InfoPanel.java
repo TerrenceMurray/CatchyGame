@@ -1,4 +1,4 @@
-package work.terrencemurray.infrastructure.ui;
+package work.terrencemurray.ui;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;

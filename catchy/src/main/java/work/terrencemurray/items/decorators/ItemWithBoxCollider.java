@@ -1,10 +1,10 @@
-package work.terrencemurray.infrastructure.items.decorators;
+package work.terrencemurray.items.decorators;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
-import work.terrencemurray.infrastructure.items.Item;
-import work.terrencemurray.infrastructure.position.Point2D;
+import work.terrencemurray.items.Item;
+import work.terrencemurray.position.Point2D;
 
 public class ItemWithBoxCollider extends Item {
     private final Item wrapped;

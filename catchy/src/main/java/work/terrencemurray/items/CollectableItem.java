@@ -1,10 +1,10 @@
-package work.terrencemurray.infrastructure.items;
+package work.terrencemurray.items;
 
 import java.awt.Graphics;
 import java.awt.Image;
 
-import work.terrencemurray.infrastructure.managers.ImageManager;
-import work.terrencemurray.infrastructure.position.Point2D;
+import work.terrencemurray.managers.ImageManager;
+import work.terrencemurray.position.Point2D;
 
 public class CollectableItem extends Item implements Collectable {
 

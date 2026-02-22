@@ -1,4 +1,4 @@
-package work.terrencemurray.infrastructure.ui;
+package work.terrencemurray.ui;
 
 import javax.swing.JPanel;
 
@@ -20,38 +20,38 @@ public class HealthBar extends JPanel {
     private int barWidth;
     private int barHeight;
     private int maxHealth;
-    private int currentHeath;
+    private int currentHealth;
 
     public HealthBar(int barWidth, int barHeight, int maxHealth) {
         this.barWidth = barWidth;
         this.barHeight = barHeight;
         this.maxHealth = maxHealth;
-        this.currentHeath = this.maxHealth;
+        this.currentHealth = this.maxHealth;
         this.setPreferredSize(new Dimension(barWidth, barHeight));
         this.setOpaque(false);
     }
 
 
     private int getFillWidth() {
-        return (int)((barWidth - 2) * ((double) currentHeath / maxHealth));
+        return (int)((barWidth - 2) * ((double) currentHealth / maxHealth));
     }
 
     public boolean isDead() {
-        return currentHeath <= 0;
+        return currentHealth <= 0;
     }
 
     public void update(int interval) {
-        if (interval + currentHeath > this.maxHealth) {
-            this.currentHeath = this.maxHealth;
+        if (interval + currentHealth > this.maxHealth) {
+            this.currentHealth = this.maxHealth;
             return;
         }
 
-        if (interval + currentHeath < 0) {
-            this.currentHeath = 0;
+        if (interval + currentHealth < 0) {
+            this.currentHealth = 0;
             return;
         }
 
-        this.currentHeath += interval;
+        this.currentHealth += interval;
         repaint();
     }
 
@@ -67,7 +67,7 @@ public class HealthBar extends JPanel {
         g2.fillRoundRect(0, 0, barWidth, barHeight, 6, 6);
 
         // Health fill
-        double healthPercent = (double) currentHeath / maxHealth;
+        double healthPercent = (double) currentHealth / maxHealth;
         g2.setColor(healthPercent > 0.3 ? FILL_COLOR : FILL_LOW_COLOR);
         g2.fillRoundRect(1, 1, getFillWidth(), barHeight - 2, 5, 5);
 

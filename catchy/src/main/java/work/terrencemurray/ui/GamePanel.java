@@ -1,18 +1,18 @@
-package work.terrencemurray.infrastructure.ui;
+package work.terrencemurray.ui;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import work.terrencemurray.infrastructure.items.CollectableItem;
-import work.terrencemurray.infrastructure.items.CollectableItem.ItemType;
-import work.terrencemurray.infrastructure.items.Item;
-import work.terrencemurray.infrastructure.items.ItemPool;
-import work.terrencemurray.infrastructure.items.decorators.ItemWithBoxCollider;
-import work.terrencemurray.infrastructure.items.decorators.ItemWithGravity;
-import work.terrencemurray.infrastructure.items.factory.ItemFactory;
-import work.terrencemurray.infrastructure.managers.ImageManager;
-import work.terrencemurray.infrastructure.managers.SoundManager;
-import work.terrencemurray.infrastructure.player.Player;
+import work.terrencemurray.items.CollectableItem;
+import work.terrencemurray.items.CollectableItem.ItemType;
+import work.terrencemurray.items.Item;
+import work.terrencemurray.items.ItemPool;
+import work.terrencemurray.items.decorators.ItemWithBoxCollider;
+import work.terrencemurray.items.decorators.ItemWithGravity;
+import work.terrencemurray.items.ItemFactory;
+import work.terrencemurray.managers.ImageManager;
+import work.terrencemurray.managers.SoundManager;
+import work.terrencemurray.player.Player;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -25,11 +25,16 @@ import java.util.Random;
 import java.util.Vector;
 
 public class GamePanel extends JPanel {
+
+    // Game tuning
     private static final int ITEM_COUNT = 5;
     private static final int ITEM_SIZE = 40;
     private static final int ANVIL_SPEED = 4;
     private static final int BANANA_SPEED = 3;
+    private static final int SCORE_PER_BANANA = 10;
+    private static final int ANVIL_DAMAGE = 5;
 
+    // Dependencies
     private final ItemPool<Item> pool;
     private final ItemFactory itemFactory = new ItemFactory();
     private final InfoPanel infoPanel;
@@ -37,7 +42,9 @@ public class GamePanel extends JPanel {
     private final Random random = new Random();
     private final Timer gameTimer;
     private final SoundManager soundManager = SoundManager.getInstance();
-    private Image backgroundImage;
+    private final Image backgroundImage;
+
+    // State
     private int score = 0;
     private boolean gameOver = false;
 
@@ -57,13 +64,14 @@ public class GamePanel extends JPanel {
         }, ITEM_COUNT);
 
         this.player = new Player();
-        this.addKeyListener(this.player);
 
         gameTimer = new Timer(16, e -> {
             updateItems();
             repaint();
         });
     }
+
+    // -- Lifecycle --
 
     public void start() {
         soundManager.playClip("gameStart", false);
@@ -76,6 +84,8 @@ public class GamePanel extends JPanel {
         gameTimer.stop();
     }
 
+    // -- Game Logic --
+
     private void spawnItems() {
         for (int i = 0; i < ITEM_COUNT; i++) {
             int x = random.nextInt(Math.max(getWidth() - 20, 1));
@@ -85,8 +95,7 @@ public class GamePanel extends JPanel {
     }
 
     private void respawnItem(ItemWithGravity item) {
-        ItemWithBoxCollider itemCollider = (ItemWithBoxCollider) item.getWrapped();
-        CollectableItem collectable = (CollectableItem) itemCollider.getWrapped();
+        CollectableItem collectable = unwrapCollectable(item);
 
         ItemType type = random.nextBoolean() ? ItemType.BANANA : ItemType.ANVIL;
         collectable.setType(type);
@@ -105,30 +114,21 @@ public class GamePanel extends JPanel {
             ItemWithGravity item = (ItemWithGravity) active.get(i);
             item.fall();
 
-            // Check collision with player
-            ItemWithBoxCollider itemCollider = (ItemWithBoxCollider) item.getWrapped();
+            ItemWithBoxCollider itemCollider = unwrapCollider(item);
             if (itemCollider.intersects(player.getCollider())) {
                 CollectableItem collectable = (CollectableItem) itemCollider.getWrapped();
+
                 if (collectable.getType() == ItemType.BANANA) {
-                    score += 10;
-                    infoPanel.setScore(score);
-                    soundManager.playClip("bananaCollect", false);
+                    collectBanana();
                 } else if (collectable.getType() == ItemType.ANVIL) {
-                    infoPanel.getHealthBar().update(-5);
-                    soundManager.playClip("anvilHit", false);
-                    if (infoPanel.getHealthBar().isDead()) {
-                        gameOver = true;
-                        soundManager.stopClip("background");
-                        soundManager.playClip("gameOver", false);
-                        return;
-                    }
+                    hitByAnvil();
+                    if (gameOver) return;
                 }
 
                 respawnItem(item);
                 continue;
             }
 
-            // Respawn at top if off screen
             if (item.getCurrentPosition().getY() > getHeight()) {
                 respawnItem(item);
             }
@@ -136,6 +136,25 @@ public class GamePanel extends JPanel {
 
         this.player.update(getWidth(), getHeight());
     }
+
+    private void collectBanana() {
+        score += SCORE_PER_BANANA;
+        infoPanel.setScore(score);
+        soundManager.playClip("bananaCollect", false);
+    }
+
+    private void hitByAnvil() {
+        infoPanel.getHealthBar().update(-ANVIL_DAMAGE);
+        soundManager.playClip("anvilHit", false);
+
+        if (infoPanel.getHealthBar().isDead()) {
+            gameOver = true;
+            soundManager.stopClip("background");
+            soundManager.playClip("gameOver", false);
+        }
+    }
+
+    // -- Rendering --
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -145,58 +164,62 @@ public class GamePanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        // Display background
         if (backgroundImage != null) {
             g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
         }
 
-        // Display falling items
         for (Item item : pool.getActive()) {
             item.render(g2);
         }
 
-        // Display player
         this.player.render(g2);
 
-        // Game over overlay
         if (gameOver) {
-            g2.setColor(new Color(0, 0, 0, 160));
-            g2.fillRect(0, 0, getWidth(), getHeight());
-
-            int centerY = getHeight() / 2;
-
-            // "GAME OVER" with drop shadow
-            Font titleFont = new Font("Arial", Font.BOLD, 42);
-            g2.setFont(titleFont);
-            FontMetrics fm = g2.getFontMetrics();
-            String title = "GAME OVER";
-            int titleX = (getWidth() - fm.stringWidth(title)) / 2;
-
-            g2.setColor(new Color(0, 0, 0, 120));
-            g2.drawString(title, titleX + 3, centerY - 10 + 3);
-            g2.setColor(new Color(220, 50, 50));
-            g2.drawString(title, titleX, centerY - 10);
-
-            // Final score
-            Font scoreFont = new Font("Arial", Font.BOLD, 20);
-            g2.setFont(scoreFont);
-            fm = g2.getFontMetrics();
-            String scoreText = "Final Score: " + score;
-            int scoreX = (getWidth() - fm.stringWidth(scoreText)) / 2;
-            g2.setColor(new Color(255, 215, 0));
-            g2.drawString(scoreText, scoreX, centerY + 30);
+            renderGameOverOverlay(g2);
         }
+    }
+
+    private void renderGameOverOverlay(Graphics2D g2) {
+        g2.setColor(new Color(0, 0, 0, 160));
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        int centerY = getHeight() / 2;
+
+        Font titleFont = new Font("Arial", Font.BOLD, 42);
+        g2.setFont(titleFont);
+        FontMetrics fm = g2.getFontMetrics();
+        String title = "GAME OVER";
+        int titleX = (getWidth() - fm.stringWidth(title)) / 2;
+
+        g2.setColor(new Color(0, 0, 0, 120));
+        g2.drawString(title, titleX + 3, centerY - 10 + 3);
+        g2.setColor(new Color(220, 50, 50));
+        g2.drawString(title, titleX, centerY - 10);
+
+        Font scoreFont = new Font("Arial", Font.BOLD, 20);
+        g2.setFont(scoreFont);
+        fm = g2.getFontMetrics();
+        String scoreText = "Final Score: " + score;
+        int scoreX = (getWidth() - fm.stringWidth(scoreText)) / 2;
+        g2.setColor(new Color(255, 215, 0));
+        g2.drawString(scoreText, scoreX, centerY + 30);
+    }
+
+    // -- Helpers --
+
+    private ItemWithBoxCollider unwrapCollider(ItemWithGravity item) {
+        return (ItemWithBoxCollider) item.getWrapped();
+    }
+
+    private CollectableItem unwrapCollectable(ItemWithGravity item) {
+        return (CollectableItem) unwrapCollider(item).getWrapped();
     }
 
     public void setDebugging(boolean flag) {
         for (Item item : pool.getActive()) {
-            ItemWithGravity gravity = (ItemWithGravity) item;
-            ItemWithBoxCollider collider = (ItemWithBoxCollider) gravity.getWrapped();
-            collider.setDebugging(flag);
+            unwrapCollider((ItemWithGravity) item).setDebugging(flag);
         }
-
-        ItemWithBoxCollider collider = player.getCollider();
-        collider.setDebugging(flag);
+        player.getCollider().setDebugging(flag);
     }
 
     public Player getPlayer() {

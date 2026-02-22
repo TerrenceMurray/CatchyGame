@@ -1,7 +1,7 @@
-package work.terrencemurray.infrastructure.items.decorators;
+package work.terrencemurray.items.decorators;
 
-import work.terrencemurray.infrastructure.items.Item;
-import work.terrencemurray.infrastructure.position.Point2D;
+import work.terrencemurray.items.Item;
+import work.terrencemurray.position.Point2D;
 import java.awt.Graphics;
 
 public class ItemWithGravity extends Item {

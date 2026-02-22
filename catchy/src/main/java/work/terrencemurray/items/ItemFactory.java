@@ -1,8 +1,7 @@
-package work.terrencemurray.infrastructure.items.factory;
+package work.terrencemurray.items;
 
-import work.terrencemurray.infrastructure.items.Item;
-import work.terrencemurray.infrastructure.items.decorators.ItemWithBoxCollider;
-import work.terrencemurray.infrastructure.items.decorators.ItemWithGravity;
+import work.terrencemurray.items.decorators.ItemWithBoxCollider;
+import work.terrencemurray.items.decorators.ItemWithGravity;
 
 public class ItemFactory {
     private Item item;

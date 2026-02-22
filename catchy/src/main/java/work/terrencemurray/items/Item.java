@@ -1,6 +1,6 @@
-package work.terrencemurray.infrastructure.items;
+package work.terrencemurray.items;
 
-import work.terrencemurray.infrastructure.position.Point2D;
+import work.terrencemurray.position.Point2D;
 import java.awt.Graphics;
 
 public abstract class Item {

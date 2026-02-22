@@ -1,4 +1,4 @@
-package work.terrencemurray.infrastructure.items;
+package work.terrencemurray.items;
 
 import java.util.Vector;
 import java.util.function.Supplier;

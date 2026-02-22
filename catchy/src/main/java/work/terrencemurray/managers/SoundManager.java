@@ -1,4 +1,4 @@
-package work.terrencemurray.infrastructure.managers;
+package work.terrencemurray.managers;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;

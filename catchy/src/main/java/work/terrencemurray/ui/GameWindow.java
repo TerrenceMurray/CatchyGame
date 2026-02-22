@@ -1,4 +1,4 @@
-package work.terrencemurray.infrastructure.ui;
+package work.terrencemurray.ui;
 
 import java.io.InputStream;
 
@@ -9,27 +9,26 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class GameWindow extends JFrame implements KeyListener {
-    // Settings
-    private int width = 500;
-    private int height = 500;
-    private Font gamePausedFont;
+
+    private static final int WINDOW_WIDTH = 500;
+    private static final int WINDOW_HEIGHT = 500;
+
+    private Font gameFont;
     private boolean debugging = false;
 
-    // Panels
     private InfoPanel infoPanel;
     private GamePanel gamePanel;
 
     public GameWindow() {
-        // Window configuration
         this.setTitle("Catchy");
-        this.setSize(this.width, this.height);
+        this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
 
-        this.loadFont();
+        loadFont();
 
-        infoPanel = new InfoPanel(gamePausedFont);
+        infoPanel = new InfoPanel(gameFont);
         this.add(infoPanel, BorderLayout.NORTH);
 
         gamePanel = new GamePanel(infoPanel);
@@ -39,34 +38,31 @@ public class GameWindow extends JFrame implements KeyListener {
         this.setFocusable(true);
         this.requestFocus();
 
-        // Display game window
         this.setVisible(true);
         gamePanel.start();
     }
 
     public void keyPressed(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-
-        if (keyCode == KeyEvent.VK_F1) {
+        if (e.getKeyCode() == KeyEvent.VK_F1) {
             debugging = !debugging;
             gamePanel.setDebugging(debugging);
         }
 
-        // Forward event to player
         gamePanel.getPlayer().keyPressed(e);
     }
 
     public void keyReleased(KeyEvent e) {
         gamePanel.getPlayer().keyReleased(e);
     }
+
     public void keyTyped(KeyEvent e) {}
 
     private void loadFont() {
         try {
             InputStream fontStream = getClass().getResourceAsStream("/fonts/game-paused.otf");
-            this.gamePausedFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(24f);
+            gameFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(24f);
         } catch (Exception e) {
-            this.gamePausedFont = new Font("Arial", Font.PLAIN, 24); // fallback
+            gameFont = new Font("Arial", Font.PLAIN, 24);
         }
     }
 }
