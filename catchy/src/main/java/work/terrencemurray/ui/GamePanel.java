@@ -73,9 +73,9 @@ public class GamePanel extends JPanel {
                 infoPanel.setScore(score);
                 soundManager.playClip("bananaCollect", false);
             } else if (type == ItemType.BAT) {
-                infoPanel.updateHealth(-BAT_DAMAGE);
+                infoPanel.getHealthBar().update(-BAT_DAMAGE);
                 soundManager.playClip("batHit", false);
-                if (infoPanel.isDead()) {
+                if (infoPanel.getHealthBar().isDead()) {
                     stop();
                     return;
                 }

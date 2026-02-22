@@ -2,6 +2,7 @@ package work.terrencemurray.ui;
 
 import javax.swing.JPanel;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
@@ -11,14 +12,14 @@ import java.awt.RenderingHints;
 
 public class HealthBar extends JPanel {
 
-    private static final Color FILL_HIGH = new Color(50, 205, 50);
-    private static final Color FILL_HIGH_DARK = new Color(30, 140, 30);
-    private static final Color FILL_MID = new Color(255, 180, 0);
-    private static final Color FILL_MID_DARK = new Color(200, 120, 0);
-    private static final Color FILL_LOW = new Color(220, 40, 40);
-    private static final Color FILL_LOW_DARK = new Color(150, 20, 20);
-    private static final Color BACKGROUND_COLOR = new Color(40, 40, 40);
-    private static final Color BORDER_COLOR = new Color(80, 80, 80);
+    private static final Color FILL_HIGH = new Color(70, 210, 70);
+    private static final Color FILL_HIGH_DARK = new Color(40, 160, 40);
+    private static final Color FILL_MID = new Color(255, 190, 30);
+    private static final Color FILL_MID_DARK = new Color(210, 140, 10);
+    private static final Color FILL_LOW = new Color(230, 55, 55);
+    private static final Color FILL_LOW_DARK = new Color(170, 30, 30);
+    private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 100);
+    private static final Color BORDER_COLOR = new Color(255, 255, 255, 80);
 
     private int barWidth;
     private int barHeight;
@@ -35,25 +36,15 @@ public class HealthBar extends JPanel {
     }
 
     private int getFillWidth() {
-        return (int)((barWidth - 2) * ((double) currentHealth / maxHealth));
+        return (int) ((barWidth - 2) * ((double) currentHealth / maxHealth));
     }
 
     public boolean isDead() {
         return currentHealth <= 0;
     }
 
-    public void update(int interval) {
-        if (interval + currentHealth > this.maxHealth) {
-            this.currentHealth = this.maxHealth;
-            return;
-        }
-
-        if (interval + currentHealth < 0) {
-            this.currentHealth = 0;
-            return;
-        }
-
-        this.currentHealth += interval;
+    public void update(int delta) {
+        this.currentHealth = Math.max(0, Math.min(maxHealth, currentHealth + delta));
         repaint();
     }
 
@@ -63,7 +54,7 @@ public class HealthBar extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Inset background
+        // Background
         g2.setColor(BACKGROUND_COLOR);
         g2.fillRoundRect(0, 0, barWidth, barHeight, 8, 8);
 
@@ -88,12 +79,13 @@ public class HealthBar extends JPanel {
             g2.fillRoundRect(1, 1, fillWidth, barHeight - 2, 6, 6);
 
             // Glass shine on top half
-            g2.setColor(new Color(255, 255, 255, 60));
+            g2.setColor(new Color(255, 255, 255, 50));
             g2.fillRoundRect(2, 2, fillWidth - 2, (barHeight - 4) / 2, 4, 4);
         }
 
         // Border
         g2.setColor(BORDER_COLOR);
+        g2.setStroke(new BasicStroke(1f));
         g2.drawRoundRect(0, 0, barWidth - 1, barHeight - 1, 8, 8);
     }
 }
